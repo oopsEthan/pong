@@ -1,6 +1,8 @@
 from turtle import *
 import paddles_and_ball as pad_ball
-from screen_settings import GameScreen
+from game_settings import Game
 
+game = Game()
+ball = pad_ball.Ball()
 
-pass
+game.run()
