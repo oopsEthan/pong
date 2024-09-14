@@ -1,8 +1,13 @@
 from turtle import *
-import paddles_and_ball as pad_ball
+from paddles_and_ball import *
 from game_settings import Game
 
 game = Game()
-ball = pad_ball.Ball()
+ball = Ball()
+player = Player()
+opponent = Opponent()
+
+collisions = [player, opponent]
+ball.set_possible_collisions(collisions)
 
 game.run()
