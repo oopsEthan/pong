@@ -18,13 +18,20 @@ class Game():
         self.bottom_wall = Wall("bottom")
         self.game_screen.update()
 
-        # self.collisions = [self.player, self.opponent, self.top_wall, self.bottom_wall]
-        # self.ball.set_possible_collisions(self.collisions)
-
+        self.collisions = [self.player, self.opponent, self.top_wall, self.bottom_wall]
+        self.ball.set_possible_collisions(self.collisions)
+        
+        self.game_screen.listen()
+        self.game_screen.onkeypress(self.player.go_up, "w")
+        self.game_screen.onkeypress(self.player.go_down, "s")
+        self.game_screen.onkeyrelease(self.player.stop, "w")
+        self.game_screen.onkeyrelease(self.player.stop, "s")
+        
         self.game_loop()
 
     def run_moves(self):
         self.ball.travel()
+        self.player.move()
 
     def game_loop(self):
         self.run_moves()
