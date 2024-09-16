@@ -73,8 +73,11 @@ class Ball:
                     self.bounce(col)
             elif isinstance(col, Paddle):
                 if abs(self.ball_obj.xcor() - col.paddle_obj.xcor()) <= self.ball_radius + col.paddle_width:
-                    if abs(self.ball_obj.ycor() - col.paddle_obj.ycor()) <= self.ball_radius + (col.paddle_height / 2):
+                    paddle_top = col.paddle_obj.ycor() + (col.paddle_height * 20 / 2)
+                    paddle_bottom = col.paddle_obj.ycor() - (col.paddle_height * 20 / 2)
+                    if paddle_bottom <= self.ball_obj.ycor() <= paddle_top:
                         self.bounce(col)
+
     
     def bounce(self, collider) -> None:
         if isinstance(collider, Wall):
