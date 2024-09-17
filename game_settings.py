@@ -1,6 +1,57 @@
 from turtle import *
 from game_objects import *
 
+class UI():
+    def __init__(self) -> None:
+        self.ui_turtle = Turtle()
+        self.score_turtle = Turtle()
+        self.player_score = 0
+        self.opponent_score = 0
+        self.render_ui()
+
+    def render_ui(self) -> None:
+        initialize_basic_graphics(self.ui_turtle, "white", 1, 1)
+        initialize_basic_graphics(self.score_turtle, "white", 1, 1)
+        self.ui_turtle.hideturtle()
+        self.score_turtle.hideturtle()
+        self.ui_turtle.width(4)
+        self.ui_turtle.rt(90)
+        self.reset_position(self.ui_turtle)
+        self.draw_line_down_middle()
+        self.draw_score()
+    
+    def draw_line_down_middle(self) -> None:
+        lines = 40
+        dotted = True
+        while lines > 0:
+            if dotted:
+                self.ui_turtle.pd()
+            else:
+                self.ui_turtle.pu()
+            dotted = not dotted
+            self.ui_turtle.fd(30)
+            lines -= 1
+        self.reset_position(self.ui_turtle)
+
+    def draw_score(self):
+        self.score_turtle.clear()
+        player_score_position = -50
+        opponent_score_position = 50
+        self.score_turtle.goto(player_score_position, 275)
+        self.score_turtle.write(f"{self.player_score}", align="center", font=("Courier", 48, "normal"))
+        self.score_turtle.goto(opponent_score_position, 275)
+        self.score_turtle.write(f"{self.opponent_score}", align="center", font=("Courier", 48, "normal"))
+    
+
+    def update_score(self, scorer) -> None:
+        if(scorer == Player):
+            scorer.player_score += 1
+        else:
+            scorer.opponent_score += 1
+
+    def reset_position(self, tur) -> None:
+        tur.goto(0, 365)
+
 class Game():
     def __init__(self) -> None:
         self.SCREEN_X = 1280
@@ -17,6 +68,7 @@ class Game():
         self.top_wall = Wall("top")
         self.bottom_wall = Wall("bottom")
         self.game_screen.update()
+        self.ui = UI()
 
         self.collisions = [self.player, self.opponent, self.top_wall, self.bottom_wall]
         self.ball.set_possible_collisions(self.collisions)
