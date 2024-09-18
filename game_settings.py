@@ -44,10 +44,12 @@ class UI():
     
 
     def update_score(self, scorer) -> None:
-        if(scorer == Player):
-            scorer.player_score += 1
+        if(scorer == "player"):
+            self.player_score += 1
         else:
-            scorer.opponent_score += 1
+            self.opponent_score += 1
+        
+        self.draw_score()
 
     def reset_position(self, tur) -> None:
         tur.goto(0, 365)
@@ -82,6 +84,7 @@ class Game():
         self.game_loop()
 
     def run_moves(self):
+        self.ball.detect_score(self.ui)
         self.ball.travel()
         self.player.move()
 

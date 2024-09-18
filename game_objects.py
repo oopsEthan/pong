@@ -1,5 +1,13 @@
 from turtle import *
 
+# Global variables
+PLAYER_X = -550 # Starting location of player paddle
+OPPONENT_X = -PLAYER_X # Starting location of opponent paddle (opposite of player paddle)
+OPPONENT_SPEED = 5 # Speed of opponent paddle
+BALL_SPEED = 4 # Speed of ball
+TOP_WALL_Y = 365 # Starting location for top wall
+BOTTOM_WALL_Y = -350 # Start location for bottom wall
+
 # Many objects are the same color, shape, pen_up, etc.
 #   Call this function when needing to set up the basics
 def initialize_basic_graphics(tur, color, x, y) -> None:
@@ -23,33 +31,42 @@ class Player(Paddle):
     def set_up_paddle_obj(self) -> None:
         super().set_up_paddle_obj()
         self.MOVE_SPEED = 10
-        self.paddle_obj.goto(-550, 0)
+        self.paddle_obj.goto(PLAYER_X, 0)
         self.y_velocity = 0
     
-    def go_up(self):
+    def go_up(self) -> None:
         self.y_velocity = self.MOVE_SPEED
     
-    def go_down(self):
+    def go_down(self) -> None:
         self.y_velocity = -self.MOVE_SPEED
     
-    def move(self):
+    def move(self) -> None:
         new_y = self.paddle_obj.ycor() + self.y_velocity
-        self.paddle_obj.goto(-550, new_y)
+        self.paddle_obj.goto(PLAYER_X, new_y)
     
-    def stop(self):
+    def stop(self) -> None:
         self.y_velocity = 0
 
 class Opponent(Paddle):
     def set_up_paddle_obj(self) -> None:
         super().set_up_paddle_obj()
-        self.paddle_obj.goto(550, 0)
+        self.paddle_obj.goto(OPPONENT_X, 0)
+        self.y_velocity = OPPONENT_SPEED
+
+    def movement(self) -> None:
+        # if tips of paddle detect wall -> bounce
+            # self.y_velocity = self.bounce_off_wall()
+        pass
+
+    def bounce_off_wall(self) -> int:
+        return -self.y_velocity
 
 class Ball:
     def __init__(self) -> None:
         self.set_up_ball_obj()
         self.collisions = []
-        self.y_velocity = -3
-        self.x_velocity = -3
+        self.y_velocity = -BALL_SPEED
+        self.x_velocity = -BALL_SPEED
         self.ball_radius = 5
 
     def set_up_ball_obj(self) -> None:
@@ -78,13 +95,27 @@ class Ball:
                     if paddle_bottom <= self.ball_obj.ycor() <= paddle_top:
                         self.bounce(col)
 
-    
+    # Bouncing off wall reverses y_velocity, bouncing off paddle reverses x_velocity
     def bounce(self, collider) -> None:
         if isinstance(collider, Wall):
             self.y_velocity = -self.y_velocity
 
         else:
             self.x_velocity = - self.x_velocity
+
+    def detect_score(self, score_ui) -> None:
+        if self.ball_obj.xcor() < (PLAYER_X - 25):
+            score_ui.update_score("opponent")
+            self.reset()
+
+        elif self.ball_obj.xcor() > (OPPONENT_X + 25):
+            score_ui.update_score("player")
+            self.reset()
+    
+    def reset(self) -> None:
+        self.y_velocity = -BALL_SPEED
+        self.x_velocity = -BALL_SPEED
+        self.ball_obj.goto(0, 0)
 
 class Wall():
     def __init__(self, location) -> None:
@@ -98,7 +129,7 @@ class Wall():
 
     def determine_vars_by_location(self) -> None:
         if self.location == "top":
-            self.y = 365
+            self.y = TOP_WALL_Y
         
         elif self.location == "bottom":
-            self.y = -350
+            self.y = BOTTOM_WALL_Y
