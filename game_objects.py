@@ -5,6 +5,7 @@ PLAYER_X = -550 # Starting location of player paddle
 OPPONENT_X = -PLAYER_X # Starting location of opponent paddle (opposite of player paddle)
 OPPONENT_SPEED = 5 # Speed of opponent paddle
 BALL_SPEED = 4 # Speed of ball
+BALL_DIAMETER = 0.75 # Diameter of ball
 TOP_WALL_Y = 365 # Starting location for top wall
 BOTTOM_WALL_Y = -350 # Start location for bottom wall
 
