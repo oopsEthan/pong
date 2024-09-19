@@ -3,8 +3,6 @@ from turtle import *
 # Global variables
 PLAYER_X = -550 # Starting location of player paddle
 OPPONENT_X = -PLAYER_X # Starting location of opponent paddle (opposite of player paddle)
-OPPONENT_SPEED = 5 # Speed of opponent paddle
-BALL_SPEED = 4 # Speed of ball
 BALL_DIAMETER = 0.75 # Diameter of ball
 TOP_WALL_Y = 365 # Starting location for top wall
 BOTTOM_WALL_Y = -350 # Start location for bottom wall
@@ -25,7 +23,12 @@ class Paddle:
         self.set_up_paddle_obj()
         self.update_paddle_boundaries()
 
-    def update_paddle_boundaries(self):
+    def detect_wall(self) -> bool:
+        if (self.y_velocity > 0 and self.paddle_top_y >= TOP_WALL_Y) or (self.y_velocity < 0 and self.paddle_bottom_y <= BOTTOM_WALL_Y):
+            return True
+        return False
+    
+    def update_paddle_boundaries(self) -> None:
         self.paddle_top_y = self.paddle_obj.ycor() + (self.paddle_height * 20) / 2
         self.paddle_bottom_y = self.paddle_obj.ycor() - (self.paddle_height * 20) / 2
 
@@ -47,7 +50,7 @@ class Player(Paddle):
         self.y_velocity = -self.MOVE_SPEED
     
     def move(self) -> None:
-        if (self.y_velocity > 0 and self.paddle_top_y < TOP_WALL_Y) or (self.y_velocity < 0 and self.paddle_bottom_y > BOTTOM_WALL_Y):
+        if not self.detect_wall():
             new_y = self.paddle_obj.ycor() + self.y_velocity
             self.paddle_obj.goto(PLAYER_X, new_y)
         self.update_paddle_boundaries()
@@ -59,14 +62,19 @@ class Opponent(Paddle):
     def set_up_paddle_obj(self) -> None:
         super().set_up_paddle_obj()
         self.paddle_obj.goto(OPPONENT_X, 0)
-        self.y_velocity = OPPONENT_SPEED
+        self.y_velocity = 0
 
     def movement(self) -> None:
-        # if tips of paddle detect wall -> bounce
-            # self.y_velocity = self.bounce_off_wall()
-        # self.update_paddle_boundaries()
-        pass
+        if self.detect_wall():
+            self.y_velocity = self.bounce_off_wall()
+        else:
+            new_y = self.paddle_obj.ycor() + self.y_velocity
+            self.paddle_obj.goto(OPPONENT_X, new_y)
+        self.update_paddle_boundaries()
 
+    def set_opponent_speed(self, opp_speed) -> None:
+        self.y_velocity = opp_speed
+    
     def bounce_off_wall(self) -> int:
         return -self.y_velocity
 
@@ -74,8 +82,6 @@ class Ball:
     def __init__(self) -> None:
         self.set_up_ball_obj()
         self.collisions = []
-        self.y_velocity = -BALL_SPEED
-        self.x_velocity = -BALL_SPEED
         self.ball_radius = 5
 
     def set_up_ball_obj(self) -> None:
@@ -91,6 +97,11 @@ class Ball:
         
     def set_possible_collisions(self, possible_collisions) -> None:
         self.collisions = possible_collisions
+    
+    def set_ball_speed(self, ball_speed) -> None:
+        self.ball_speed = ball_speed
+        self.y_velocity = -self.ball_speed
+        self.x_velocity = -self.ball_speed
     
     def check_for_collision(self) -> None:
         for col in self.collisions:
@@ -122,8 +133,8 @@ class Ball:
             self.reset()
     
     def reset(self) -> None:
-        self.y_velocity = -BALL_SPEED
-        self.x_velocity = -BALL_SPEED
+        self.y_velocity = -self.ball_speed
+        self.x_velocity = -self.ball_speed
         self.ball_obj.goto(0, 0)
 
 class Wall():
