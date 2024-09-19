@@ -23,6 +23,11 @@ class Paddle:
         self.paddle_width = 1
         self.paddle_height = 5.5
         self.set_up_paddle_obj()
+        self.update_paddle_boundaries()
+
+    def update_paddle_boundaries(self):
+        self.paddle_top_y = self.paddle_obj.ycor() + (self.paddle_height * 20) / 2
+        self.paddle_bottom_y = self.paddle_obj.ycor() - (self.paddle_height * 20) / 2
 
     def set_up_paddle_obj(self) -> None:
         self.paddle_obj = Turtle()
@@ -42,8 +47,10 @@ class Player(Paddle):
         self.y_velocity = -self.MOVE_SPEED
     
     def move(self) -> None:
-        new_y = self.paddle_obj.ycor() + self.y_velocity
-        self.paddle_obj.goto(PLAYER_X, new_y)
+        if (self.y_velocity > 0 and self.paddle_top_y < TOP_WALL_Y) or (self.y_velocity < 0 and self.paddle_bottom_y > BOTTOM_WALL_Y):
+            new_y = self.paddle_obj.ycor() + self.y_velocity
+            self.paddle_obj.goto(PLAYER_X, new_y)
+        self.update_paddle_boundaries()
     
     def stop(self) -> None:
         self.y_velocity = 0
@@ -57,6 +64,7 @@ class Opponent(Paddle):
     def movement(self) -> None:
         # if tips of paddle detect wall -> bounce
             # self.y_velocity = self.bounce_off_wall()
+        # self.update_paddle_boundaries()
         pass
 
     def bounce_off_wall(self) -> int:
@@ -72,11 +80,11 @@ class Ball:
 
     def set_up_ball_obj(self) -> None:
         self.ball_obj = Turtle()
-        diameter = 0.75
-        initialize_basic_graphics(self.ball_obj, "white", diameter, diameter)
+        initialize_basic_graphics(self.ball_obj, "white", BALL_DIAMETER, BALL_DIAMETER)
 
     def travel(self) -> None:
-        self.check_for_collision()
+        if(self.collisions):
+            self.check_for_collision()
         new_x = self.ball_obj.xcor() + self.x_velocity
         new_y = self.ball_obj.ycor() + self.y_velocity
         self.ball_obj.goto(new_x, new_y)
