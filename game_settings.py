@@ -75,7 +75,8 @@ class Game():
         self.collisions = [self.player, self.opponent, self.top_wall, self.bottom_wall]
         self.ball.set_possible_collisions(self.collisions)
         
-        self.setup_difficulty()
+        self.ball.set_ball_speed(self.setup_difficulty("ball"))
+        self.opponent.set_opponent_speed(self.setup_difficulty("opponent"))
         
         self.game_screen.listen()
         self.game_screen.onkeypress(self.player.go_up, "w")
@@ -85,16 +86,19 @@ class Game():
         
         self.game_loop()
 
-    def setup_difficulty(self):
-        ball_speed = int(self.game_screen.textinput("Ball Speed", "Please choose the ball's speed (1-10): "))
-        while ball_speed < 1 or ball_speed > 10:
-            ball_speed = int(self.game_screen.textinput("Ball Speed", "ERROR: Invalid speed, try again (1-10): "))
-        self.ball.set_ball_speed(ball_speed)
+    def setup_difficulty(self, setting):
+        valid_input = False
+        while not valid_input:
+            try:
+                selection = int(self.game_screen.textinput(f"{setting.capitalize()} Speed", f"Please choose the {setting}'s speed (1-10):"))
+                if 1 <= selection <= 10:
+                    valid_input = True
+                else:
+                    raise ValueError
+            except ValueError:
+                self.game_screen.textinput("ERROR", "Invalid input, please enter a number between 1 and 10:")
         
-        opp_speed = int(self.game_screen.textinput("Opponent Speed", "Please choose your opponent's speed (1-10): "))
-        while opp_speed < 1 or opp_speed > 10:
-            ball_speed = int(self.game_screen.textinput("Opponent Speed", "ERROR: Invalid speed, try again (1-10): "))
-        self.opponent.set_opponent_speed(opp_speed)
+        return selection
 
 
     def run_moves(self):
